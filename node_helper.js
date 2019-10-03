@@ -2,11 +2,11 @@ var NodeHelper = require('node_helper');
 var sensor = require("node-dht-sensor");
 
 module.exports = NodeHelper.create({
-	start: function() {
+	start: function () {
 		this.sensors = [];
 	},
 
-	getSensorInformation: function(name) {
+	getSensorInformation: function (name) {
 		console.log('Reading ' + name + ' which is of type ' + this.sensors[name].type + ' on input ' + this.sensors[name].input);
 
 		var response = sensor.read(this.sensors[name].type, this.sensors[name].input);
@@ -27,7 +27,7 @@ module.exports = NodeHelper.create({
 		};
 	},
 
-	socketNotificationReceived: function(notification, payload) {
+	socketNotificationReceived: function (notification, payload) {
 		console.log(notification + " received");
 
 		if (notification === 'REGISTER_SENSOR') {
@@ -40,7 +40,7 @@ module.exports = NodeHelper.create({
 			console.log(this.sensors);
 			this.sendSocketNotification('REGISTERED_SENSOR', null);
 		}
-		else if( notification === 'SENSOR_INFO_REQ') {
+		else if (notification === 'SENSOR_INFO_REQ') {
 			console.log('Sensor info needed for ' + payload);
 			var data = this.getSensorInformation(payload);
 

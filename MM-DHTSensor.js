@@ -3,29 +3,29 @@ const DHT22 = 22;
 
 Module.register('MM-DHTSensor', {
 
-    defaults: {
-        updateInterval: 10 * 1000,
-	name: 'Mirror',
-	type: DHT11,
-	input: 3,
-    },
+	defaults: {
+		updateInterval: 10 * 1000,
+		name: 'Mirror',
+		type: DHT11,
+		input: 3,
+	},
 
 	registered: false,
 
-	getStyles: function() {
-        	return ["weather-icons.css"];
-    	},
+	getStyles: function () {
+		return ["weather-icons.css"];
+	},
 
-    start: function() {
-	this.readingError = true;
-        this.currentTemperature = 0;
-        this.currentHumidity = 0;
-	Log.info("Starting module: " + this.name);
+	start: function () {
+		this.readingError = true;
+		this.currentTemperature = 0;
+		this.currentHumidity = 0;
+		Log.info("Starting module: " + this.name);
 
-	this.scheduleUpdate();
-    },
+		this.scheduleUpdate();
+	},
 
-	registerSensor: function() {
+	registerSensor: function () {
 		var json = {
 			'name': this.config.name,
 			'type': this.config.type,
@@ -35,40 +35,40 @@ Module.register('MM-DHTSensor', {
 		this.sendSocketNotification('REGISTER_SENSOR', json);
 	},
 
-    getDom: function() {
-        var wrapper = document.createElement('div');
-	if (this.registered === false) {
-		wrapper.innerHTML = this.config.name + ' sensor currently registering';
-	}
-	else if (this.readingError === true) {
-		wrapper.innerHTML = 'Error Reading Sensor for ' + this.config.name;
-	}
-	else {
-		var main = document.createElement("div");
-		main.className = "large light";
+	getDom: function () {
+		var wrapper = document.createElement('div');
+		if (this.registered === false) {
+			wrapper.innerHTML = this.config.name + ' sensor currently registering';
+		}
+		else if (this.readingError === true) {
+			wrapper.innerHTML = 'Error Reading Sensor for ' + this.config.name;
+		}
+		else {
+			var main = document.createElement("div");
+			main.className = "large light";
 
-		var title = document.createElement("span");
-		title.innerHTML = this.config.name + ' sensors';
-		title.className = "bright";
-		main.appendChild(title);
+			var title = document.createElement("span");
+			title.innerHTML = this.config.name + ' sensors';
+			title.className = "bright";
+			main.appendChild(title);
 
-		var temp = this.showTemperature(this.currentTemperature);
-		main.appendChild(temp);
+			var temp = this.showTemperature(this.currentTemperature);
+			main.appendChild(temp);
 
-		var humidity = this.showHumidity(this.currentHumidity);
-		main.appendChild(humidity);
+			var humidity = this.showHumidity(this.currentHumidity);
+			main.appendChild(humidity);
 
-        	wrapper.appendChild(main);
-	}
-	return wrapper;
-    },
+			wrapper.appendChild(main);
+		}
+		return wrapper;
+	},
 
-	showTemperature: function(value) {
+	showTemperature: function (value) {
 		var element = document.createElement("div");
 		element.className = "bright";
 
 		var temperature = document.createElement("div");
-		temperature.innerHTML = 'temp: ' + value  + '°C';
+		temperature.innerHTML = 'temp: ' + value + '°C';
 
 		var spacer = document.createElement("sup");
 		spacer.innerHTML = "&nbsp;";
@@ -83,47 +83,47 @@ Module.register('MM-DHTSensor', {
 		return element;
 	},
 
-	showHumidity: function(value) {
+	showHumidity: function (value) {
 		var element = document.createElement("div");
 		element.className = "bright";
 
-            var humidity = document.createElement("span");
-            humidity.innerHTML = 'humidity: ' + value;
+		var humidity = document.createElement("span");
+		humidity.innerHTML = 'humidity: ' + value;
 
-            var spacer = document.createElement("sup");
-            spacer.innerHTML = "&nbsp;";
+		var spacer = document.createElement("sup");
+		spacer.innerHTML = "&nbsp;";
 
-            var humidityIcon = document.createElement("sup");
-            humidityIcon.className = "wi wi-humidity humidityIcon";
-            humidityIcon.innerHTML = "&nbsp;";
+		var humidityIcon = document.createElement("sup");
+		humidityIcon.className = "wi wi-humidity humidityIcon";
+		humidityIcon.innerHTML = "&nbsp;";
 
-            element.appendChild(humidity);
-            element.appendChild(spacer);
-            element.appendChild(humidityIcon);
+		element.appendChild(humidity);
+		element.appendChild(spacer);
+		element.appendChild(humidityIcon);
 
-	return element;
+		return element;
 	},
 
-    scheduleUpdate: function(delay) {
-        var nextLoad = this.config.updateInterval;
-        var self = this;
+	scheduleUpdate: function (delay) {
+		var nextLoad = this.config.updateInterval;
+		var self = this;
 
-        setTimeout(function() {
-        	self.updateSensor();
-        }, nextLoad);
-    },
+		setTimeout(function () {
+			self.updateSensor();
+		}, nextLoad);
+	},
 
-    updateSensor: function() {
-	if( this.registered === false ) {
-		this.registerSensor();
-	}
-	else {
-		Log.info("about to get sensor information");
-        	this.sendSocketNotification("SENSOR_INFO_REQ", this.config.name);
-	}
-    },
+	updateSensor: function () {
+		if (this.registered === false) {
+			this.registerSensor();
+		}
+		else {
+			Log.info("about to get sensor information");
+			this.sendSocketNotification("SENSOR_INFO_REQ", this.config.name);
+		}
+	},
 
-	socketNotificationReceived: function(notification, payload) {
+	socketNotificationReceived: function (notification, payload) {
 		if (notification === 'REGISTERED_SENSOR') {
 			Log.info('Registered sensor, start updating');
 			this.registered = true;
@@ -138,8 +138,8 @@ Module.register('MM-DHTSensor', {
 		}
 	},
 
-	maybeUpdate: function(success, temperature, humidity) {
-		if( success === false ) {
+	maybeUpdate: function (success, temperature, humidity) {
+		if (success === false) {
 			Log.info('Error reading sensor info ');
 			this.readingError = true;
 		}
