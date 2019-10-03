@@ -10,7 +10,7 @@
     "MagicMirror"
   ],
   "author": "Mark Dodgson",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/doddi/mm-dhtsensor/issues"
   },
