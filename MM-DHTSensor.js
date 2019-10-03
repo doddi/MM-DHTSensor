@@ -7,6 +7,7 @@ Module.register('MM-DHTSensor', {
 		name: 'Mirror',
 		type: DHT11,
 		input: 3,
+		test: false,
 	},
 
 	registered: false,
@@ -28,7 +29,8 @@ Module.register('MM-DHTSensor', {
 		var json = {
 			'name': this.config.name,
 			'type': this.config.type,
-			'input': this.config.input
+			'input': this.config.input,
+			'test': this.config.test,
 		};
 		Log.info('About to register: ' + JSON.stringify(json));
 		this.sendSocketNotification('REGISTER_SENSOR', json);
@@ -103,6 +105,10 @@ Module.register('MM-DHTSensor', {
 	},
 
 	socketNotificationReceived: function (notification, payload) {
+		if (payload.name !== this.config.name) {
+			return;
+		}
+
 		if (notification === 'REGISTERED_SENSOR') {
 			Log.info('Registered sensor, start updating');
 			this.registered = true;

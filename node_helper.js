@@ -12,7 +12,7 @@ module.exports = NodeHelper.create({
 		}
 	},
 
-	intervalTimer: null,
+	timer: null,
 
 	socketNotificationReceived: function (notification, payload) {
 		console.log(notification + " received");
@@ -22,42 +22,66 @@ module.exports = NodeHelper.create({
 			sensorLib.initialize(payload.type, payload.input);
 			this.sensors[payload.name] = {
 				'type': payload.type,
-				'input': payload.input
+				'input': payload.input,
+				'test': payload.test
 			};
 
-			this.sendSocketNotification('REGISTERED_SENSOR', null);
-
-			var self = this;
-			this.intervalTimer = setInterval(function () {
-				self.readSensors()
-			}, 5000);
+			this.sendSocketNotification('REGISTERED_SENSOR', { 'name': payload.name });
+			this.scheduleUpdate();
 		}
+	},
+
+	scheduleUpdate: function () {
+		var self = this;
+
+		if (this.timer !== null) {
+			clearTimeout(this.timer);
+		}
+
+		this.timer = setTimeout(function () {
+			self.readSensors()
+		}, 5000);
 	},
 
 	readSensors: function () {
 		console.log('Attempting to read sensors');
 
 		for (var sensor in this.sensors) {
-			response = sensorLib.read(this.sensors[sensor].type, this.sensors[sensor].input);
-
 			var json = {};
-			if (response.isValid === false) {
-				console.log('Error reading from sensor');
+			if (this.sensors[sensor].test === true) {
 				json = {
-					'success': false,
-					'temp': null,
-					'humidity': null
+					'name': sensor,
+					'success': true,
+					'temp': parseFloat(Math.random() * 100).toFixed(2),
+					'humidity': parseFloat(Math.random() * 100).toFixed(2)
 				};
 			}
-
-			json = {
-				'success': true,
-				'temp': response.temperature,
-				'humidity': response.humidity
-			};
-
+			else {
+				json = this.readSensor(sensor, json);
+			}
 			this.sendSocketNotification('SENSOR_INFO', json);
 		}
+		this.scheduleUpdate();
 	},
+
+	readSensor: function (sensor, json) {
+		response = sensorLib.read(this.sensors[sensor].type, this.sensors[sensor].input);
+		if (response.isValid === false) {
+			console.log('Error reading from sensor');
+			json = {
+				'name': sensor,
+				'success': false,
+				'temp': null,
+				'humidity': null
+			};
+		}
+		json = {
+			'name': sensor,
+			'success': true,
+			'temp': response.temperature,
+			'humidity': response.humidity
+		};
+		return json;
+	}
 });
 
