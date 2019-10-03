@@ -1,0 +1,21 @@
+{
+  "name": "mm-dhtsensor",
+  "version": "1.0.0",
+  "description": "Reads a DHT sensor from gpio pins",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/doddi/mm-dhtsensor.git"
+  },
+  "keywords": [
+    "MagicMirror"
+  ],
+  "author": "Mark Dodgson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doddi/mm-dhtsensor/issues"
+  },
+  "homepage": "https://github.com/doddi/mm-dhtsensor#readme",
+  "dependencies": {
+    "node-dht-sensor": "^0.4.0"
+  }
+}
